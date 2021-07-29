@@ -86,9 +86,10 @@ def det_sampler(ell, ell0, M, sampler):
     # Coarse level
     if ell > ell0:
         g_coarse = sampler.sample_g(noise, ell-1, 0)
-        cost += M*2**(sampler.gamma*(ell-1))
+        correct, fine_term, cost, cost_f = sampler.multilevel_correction(g_fine, g_coarse, ell, ell-1, noise)
     else:
         g_coarse = 'NA'
+        correct, cost, cost_f = sampler.multilevel_correction(g_fine, g_coarse, ell, ell-1, noise)
+        fine_term = correct
 
-    out = sampler.multilevel_correction(g_fine, g_coarse, ell, ell-1, noise)
-    return (np.array([np.sum((out[0])**i) for i in [1,2]]), np.sum(out[1]), np.sum(out[1]**2), out[-2], out[-1])
+    return (np.array([np.sum((correct)**i) for i in [1,2]]), np.sum(fine_term), np.sum(fine_term**2), cost, cost_f)
