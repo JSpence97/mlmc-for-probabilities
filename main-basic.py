@@ -36,12 +36,7 @@ for name in names:
     sampler = basic_sampler(gamma = gammas[counter], sigma = sigma,loss = L_eta, noise_samples = noise_samples,\
         Zhat = lambda M, ell, noise: Zhat(M, ell, noise, betas[counter]))
     mlmc_temp = mlmc(r=rs[counter], c=c, sampler = sampler)
-    for ell in ells:  # Independent calculation for level ell statistcs
-        print('\nell = ', ell)
-        mlmc_temp.evaluate(ell, M)
-        print('\ncost: ', mlmc_temp.output.costs)
-        print('variance: ', mlmc_temp.output.Vs)
-        print('means: ', mlmc_temp.output.means)
+    mlmc_temp.evaluate(ells, M)  # Independent calculation for level ell statistcs
     mlmc_temp.save(name + '-levels.csv')  # Save independent experiments
     mlmc_temp.find_l0(M, tol_ell0=1.1) # Find optimal starting level then perform and store mlmc results
     mlmc_temp.cmlmc(tols,beta =  betas[counter], alpha = alphas[counter], err_split = err_split, paramrange = paramrange)

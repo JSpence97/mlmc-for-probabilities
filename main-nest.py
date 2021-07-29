@@ -40,12 +40,7 @@ for name in names:
     print('\n\n---------------------------------------------------------\n\n', name)
     sampler = nested_model_prob(N0=N0, gamma=gammas[counter], sigma=sigma, reuse_samples=reuse[counter], loss = L_eta)
     mlmc_temp = mlmc(r=rs[counter], c=c, sampler = sampler)
-    for ell in ells:  # Pre compute level ell statistics for required levels for independent results
-        print('\nell = ', ell)
-        mlmc_temp.evaluate(ell, M)
-        print('\ncost: ', mlmc_temp.output.costs)
-        print('variance: ', mlmc_temp.output.Vs)
-        print('means: ', mlmc_temp.output.means)
+    mlmc_temp.evaluate(ells, M)  # Pre compute level ell statistics for required levels for independent results
     mlmc_temp.save(name + '-levels.csv')  # Save result of independent experiment
     mlmc_temp.find_l0(M0, tol_ell0 = 1.1)    # Find optimal starting level
     mlmc_temp.cmlmc(tols, beta = betas[counter], alpha = alphas[counter], err_split = err_split, p = p, tmax = tmax, \

@@ -59,26 +59,34 @@ class mlmc:
         self.output = amlmc_out() # Initialise output object
 
 
-    def evaluate(self, ell, M):
-    #Implements level l functional of MLMC for purpose of numerical experiments independent of full MLMC computation
+    def evaluate(self, ells, M):
+        #Implements level l functional of MLMC for purpose of numerical experiments independent of full MLMC computation
         # Initialise params
-        cost = 0
-        sums = 0
-        sumsf = 0
-        Vf = 0  # Variance of fine estimator
-        mf = 0  # Mean of fine estimator
-
-        # Perform level l mlmc (scale number of samples taken according to level to save memory costs)
-        M_temp = int(min(10**6/(2**(self.gamma*ell)), M))
-        count = 0
-        while count < M:
-            term = self.mlmc_sampler(ell, self.ell0, M_temp)
-            sums += term[0]
-            sumsf += np.array(term[1:3])
-            cost += term[-2]
-            count += M_temp
-            M_temp = int(min(10**6/(2**(self.gamma*ell)), M - count))
-        self.output.update(M, ell, cost, sums, sumsf)
+        print('%-8s%-4s%-15s%-4s%-15s%-4s%-15s%-4s%-15s%-4s%-15s%-4s%-15s'\
+            %('level','|', 'mean','|', 'variance','|', 'cost','|','mean_f', '|', 'variance_f','|','time elapsed'))
+        print(122*'-')
+        for ell in ells:
+            cost = 0
+            sums = 0
+            sumsf = 0
+            Vf = 0  # Variance of fine estimator
+            mf = 0  # Mean of fine estimator
+            t0 = perf_counter()
+            # Perform level l mlmc (scale number of samples taken according to level to save memory costs)
+            M_temp = int(min(10**6/(2**(self.gamma*ell)), M))
+            count = 0
+            while count < M:
+                term = self.mlmc_sampler(ell, self.ell0, M_temp)
+                sums += term[0]
+                sumsf += np.array(term[1:3])
+                cost += term[-2]
+                count += M_temp
+                M_temp = int(min(10**6/(2**(self.gamma*ell)), M - count))
+            self.output.update(M, ell, cost, sums, sumsf)
+            t1 = perf_counter()-t0
+            print('%-8i%-4s%-15e%-4s%-15e%-4s%-15f%-4s%-15e%-4s%-15e%-4s%-15e'\
+                %(ell,'|', self.output.means[-1], '|', self.output.Vs[-1],\
+                '|', self.output.costs[-1]/self.output.Ms[-1],'|', self.output.mfs[-1], '|',self.output.Vfs[-1],'|',t1))  # Prints useful data
 
 
 

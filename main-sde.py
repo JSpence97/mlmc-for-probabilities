@@ -64,12 +64,7 @@ for name in names:  # For each method defined above
     sampler = digital_option(a, b, T, S0, combine_sde, gammas[counter], steps0, sigma, num_stocks = num_stocks,\
         corr = rho, threshold = loss_thresh, method = methods[counter], db = db)  # Define digital option sampler
     mlmc_temp = mlmc(r=rs[counter], c=c, sampler = sampler)  # Define corresonding mlmc estimator
-    for ell in ells:  # Loop over all levels to pre-compute statistics independent from main MLMC computation
-        print('\nell = ', ell)
-        mlmc_temp.evaluate(ell, M)
-        print('\ncost: ', mlmc_temp.output.costs)
-        print('variance: ', mlmc_temp.output.Vs)
-        print('means: ', mlmc_temp.output.means)
+    mlmc_temp.evaluate(ells, M) # Loop over all levels to pre-compute statistics independent from main MLMC computation
     mlmc_temp.save(name + '-' + methods[counter]+ '-levels.csv') # Save data
     mlmc_temp.find_l0(M0, tol_ell0 = 1.1)  # Estimate optimal starting level
     mlmc_temp.cmlmc(tols, beta = betas[counter], alpha = alphas[counter], err_split = err_split, p = p,\
